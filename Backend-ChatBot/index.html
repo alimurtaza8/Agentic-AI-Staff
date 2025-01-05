@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chat-box { border: 1px solid #ccc; height: 300px; overflow-y: auto; margin-bottom: 10px; padding: 10px; }
+        #user-input { width: 80%; padding: 5px; }
+        #send-button { padding: 5px; }
+        .message { margin: 5px 0; }
+        .user { text-align: right; color: blue; }
+        .bot { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <h1>Agentic AI Chatbot</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type your message">
+    <button id="send-button">Send</button>
+
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-button");
+
+        const backendUrl = "https://chatbot-backend-rho-six.vercel.app/";
+
+        sendButton.addEventListener("click", async () => {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Display user message
+            chatBox.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
+
+            // Call the backend API
+            try {
+                const response = await fetch(backendUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_message: message })
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch");
+
+                const data = await response.json();
+                chatBox.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${data.bot_response}</div>`;
+            } catch (error) {
+                chatBox.innerHTML += `<div class="message bot"><strong>Error:</strong> Unable to connect to chatbot.</div>`;
+            }
+
+            // Clear input field
+            userInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+        });
+    </script>
+</body>
+</html>
